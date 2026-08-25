@@ -3,322 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dijital Kartvizit V1 - Batuhan Bayatlı</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="description" content="Sigorta acenteleri için veritabanısız, URL tabanlı akıllı dijital kartvizit ve vitrin posteri oluşturucu.">
+    <meta name="author" content="Batuhan Bayatlı">
+    <title>Dijital Kartvizit // Akıllı Acente Asistanı</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+   
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root { --primary: #2563eb; --dark: #0f172a; --bg: #e2e8f0; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
 
         
         #poster-area { display: none; }
-
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-box { background: white; width: 90%; max-width: 600px; padding: 2rem; border-radius: 16px; text-align: center; border: 1px solid #cbd5e1; }
-        .modal-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 1rem; color: #dc2626; }
-        .modal-text { font-size: 0.9rem; text-align: left; background: #fff1f2; padding: 20px; border-radius: 8px; margin-bottom: 2rem; max-height: 40vh; overflow-y: auto; border: 1px solid #fecaca; line-height: 1.5; }
-        .modal-btn { background: var(--dark); color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 1rem; }
-
-        .editor-panel { width: 420px; background: white; padding: 2rem; overflow-y: auto; border-right: 1px solid #ddd; z-index: 10; display: flex; flex-direction: column; gap: 1rem; }
-        .section-title { font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 1rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; }
-        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 5px; }
-        .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; }
-        
-        .style-tools { display: flex; gap: 10px; align-items: center; margin-top: 5px; }
-        .style-btn { width: 35px; height: 35px; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .style-btn.active { background: var(--dark); color: white; }
-        .color-input { width: 40px; height: 35px; padding: 2px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer;}
-
-        .btn-generate { background: var(--dark); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; }
-        
-        .link-result { background: #eff6ff; border: 1px solid #bfdbfe; padding: 20px; border-radius: 12px; display: none; margin-top: 15px; text-align: center; }
-        .link-actions { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;}
-        .action-sm-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; min-width: 120px; }
-        .btn-copy { background: #3b82f6; color: white; }
-        .btn-shorten { background: #f59e0b; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center;}
-        .btn-print { background: #10b981; color: white; width: 100%; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-
-        #qrcode { margin: 15px auto; display: flex; justify-content: center; background: white; padding: 10px; border-radius: 8px; width: fit-content; border: 1px solid #ddd; }
-
-        .preview-area { flex: 1; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; }
-        .phone-mockup { width: 340px; height: 680px; background: #1e293b; border-radius: 45px; padding: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 8px solid #334155; position: relative; transition: 0.3s; }
-        .screen { background-color: #0f172a; background-size: cover; background-position: center; width: 100%; height: 100%; border-radius: 35px; overflow-y: auto; overflow-x: hidden; position: relative; color: white; display: flex; flex-direction: column; }
-        .screen-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.9)); z-index: 1; pointer-events: none; }
-        .content-wrapper { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; }
-
-        .card-header { text-align: center; padding: 3rem 1.5rem 1.5rem; }
-        .logo-box { width: 110px; height: 110px; margin: 0 auto 1rem; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 4px solid rgba(255,255,255,0.3); }
-        .logo-img { width: 100%; height: 100%; object-fit: cover; }
-        .firm-name { font-size: 1.6rem; font-weight: 800; margin: 0; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .firm-title { font-size: 0.95rem; opacity: 0.95; margin-top: 8px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-
-        .action-list { padding: 0 1.5rem; display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
-        .action-btn { display: flex; align-items: center; padding: 14px; border-radius: 14px; text-decoration: none; color: white; font-weight: 600; font-size: 0.95rem; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); transition: transform 0.2s; }
-        .action-btn:active { transform: scale(0.98); }
-        .action-btn i { width: 30px; font-size: 1.3rem; text-align: center; margin-right: 12px; }
-
-        .btn-iban-content { display: flex; flex-direction: column; width: 100%; overflow: hidden; }
-        .iban-label { font-size: 0.8rem; opacity: 0.8; margin-bottom: 2px; }
-        .iban-number { font-family: 'Courier New', monospace; font-size: 0.8rem; letter-spacing: 0px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .bg-ws { background: linear-gradient(90deg, #25D366 0%, #128C7E 100%); border: none; }
-        .bg-map { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); border: none; }
-        
-        .footer { margin-top: auto; padding: 25px; text-align: center; color: rgba(255,255,255,0.6); font-size: 0.8rem; }
-        .dev-signature a { color: rgba(255,255,255,0.8); text-decoration: none; border-bottom: 1px dotted rgba(255,255,255,0.5); }
-
-        
-        body.view-mode { background-color: #111827; display: flex; align-items: center; justify-content: center; }
-        body.view-mode .editor-panel { display: none; }
-        body.view-mode .preview-area { background: transparent; width: auto; padding: 20px; }
-        body.view-mode .phone-mockup { width: 380px; height: 85vh; max-height: 800px; box-shadow: 0 0 50px rgba(0,0,0,0.5); margin: 0 auto; }
-
-        
-        @media (max-width: 768px) {
-            
-            body:not(.view-mode) .preview-area { display: none; }
-            body:not(.view-mode) .editor-panel { width: 100%; z-index: 20; position: absolute; height: 100%; }
-
-            
-            body.view-mode .editor-panel { display: none; }
-            body.view-mode .preview-area { display: flex; width: 100%; height: 100%; padding: 0; }
-            
-            body.view-mode .phone-mockup { width: 100%; height: 100%; border: none; border-radius: 0; box-shadow: none; padding: 0; }
-            body.view-mode .screen { border-radius: 0; }
-        }
-
-        .hidden { display: none !important; }
-        .toast { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 30px; border-radius: 30px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-weight: bold; }
-
-        
         @media print {
             body * { visibility: hidden; }
             #poster-area, #poster-area * { visibility: visible; }
-            
             #poster-area {
                 display: flex !important;
                 flex-direction: column;
                 align-items: center;
-                justify-content: center;
+                justify-content: space-between;
                 position: absolute;
-                left: 0;
-                top: 0;
+                inset: 0;
                 width: 100%;
                 height: 100%;
-                background: white;
-                color: black;
-                padding: 20px;
+                background: #ffffff;
+                color: #0f172a;
+                padding: 40px;
                 box-sizing: border-box;
             }
-
-            .print-logo-box { width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-            .print-logo-img { width: 100%; height: 100%; object-fit: contain; }
-            .print-logo-icon { font-size: 5rem; color: #ccc; }
-            
-            .print-title { font-size: 3rem; font-weight: 800; text-transform: uppercase; margin: 0; color: #111; text-align: center; line-height: 1.2;}
-            .print-subtitle { font-size: 1.5rem; color: #555; margin-top: 10px; margin-bottom: 40px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px;}
-            
-            .print-qr-box { 
-                border: 4px solid #000; 
-                padding: 15px; 
-                border-radius: 20px; 
-                margin-bottom: 30px;
-                display: flex; justify-content: center; align-items: center;
-            }
-            .print-qr-box img { width: 350px !important; height: 350px !important; display: block; }
-            
-            .print-cta { 
-                font-size: 1.8rem; 
-                font-weight: bold; 
-                color: #2563eb; 
-                background: #eff6ff; 
-                padding: 15px 40px; 
-                border-radius: 50px; 
-                border: 2px solid #bfdbfe;
-            }
-            .print-footer { margin-top: auto; font-size: 0.9rem; color: #999; padding-bottom: 20px; }
         }
+
+        
+        body.view-mode .editor-panel { display: none !important; }
+        body.view-mode .preview-container { width: 100% !important; background: #0f172a; padding: 0; }
+        body.view-mode .phone-wrapper {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+        }
+        body.view-mode .phone-screen { border-radius: 0; }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
 
+   
     <div id="poster-area">
-        <div class="print-logo-box">
-            <img src="" id="printLogo" class="print-logo-img" style="display:none;">
-            <i class="fas fa-building print-logo-icon" id="printIcon"></i>
-        </div>
-        <div class="print-title" id="printName">Firma Adı</div>
-        <div class="print-subtitle" id="printTitle">Ünvan</div>
-        <div class="print-qr-box" id="qrcode-poster"></div>
-        <div class="print-cta">Hızlı İşlem İçin Okutun 📷</div>
-        <div class="print-footer">Dijital Kartvizit V1 | Developed by Batuhan Bayatlı</div>
-    </div>
-
-    <div class="modal-overlay" id="legalModal">
-        <div class="modal-box">
-            <div class="modal-title"><i class="fas fa-exclamation-triangle"></i> Yasal Bilgilendirme</div>
-            <div class="modal-text">
-                <strong>1. Ücretsiz Yazılım:</strong> Bu sistem, acentelerin dijitalleşmesi için Batuhan Bayatlı tarafından ücretsiz geliştirilmiştir.<br><br>
-                <strong>2. Veri Güvenliği:</strong> Veritabanı kullanılmamaktadır. Tüm bilgiler linkin içinde şifrelenmeden taşınır.<br><br>
-                <strong>3. Sorumluluk Reddi:</strong> Sistem "olduğu gibi" sunulmuştur. Geliştirici sorumlu değildir.
+        <div class="text-center space-y-3 mt-4">
+            <div id="printLogoBox" class="w-24 h-24 mx-auto rounded-2xl bg-slate-50 border-2 border-slate-200 flex items-center justify-center overflow-hidden">
+                <img id="printLogo" src="" class="w-full h-full object-cover hidden" alt="Logo">
+                <i data-lucide="shield-check" id="printLogoFallback" class="w-12 h-12 text-blue-600"></i>
             </div>
-            <button class="modal-btn" onclick="acceptLegal()">Okudum ve Kabul Ediyorum</button>
+            <h1 id="printName" class="text-4xl font-extrabold text-slate-900 tracking-tight">Firma Adı</h1>
+            <p id="printTitle" class="text-lg font-bold text-blue-600 uppercase tracking-widest">Yetkili Sigorta Acentesi</p>
         </div>
-    </div>
 
-    <div class="editor-panel">
-        <h2 style="margin:0; color:var(--dark);"><i class="fas fa-magic"></i> Kartvizit Oluşturucu</h2>
-        <div class="section-title">Firma Bilgileri</div>
-        <div class="form-group">
-            <label>Firma Adı</label>
-            <input type="text" class="form-control" id="inpName" placeholder="Örn: Güneş Sigorta" oninput="updatePreview()">
-            <div class="style-tools">
-                <div class="style-btn" onclick="toggleStyle('nameBold', this)"><i class="fas fa-bold"></i></div>
-                <div class="style-btn" onclick="toggleStyle('nameItalic', this)"><i class="fas fa-italic"></i></div>
-                <input type="color" class="color-input" id="colText" value="#ffffff" oninput="updatePreview()">
+        <div class="my-auto flex flex-col items-center">
+            <div class="p-6 bg-white border-4 border-slate-900 rounded-3xl shadow-xl">
+                <div id="qrcode-poster"></div>
             </div>
-            <input type="hidden" id="nameBold" value="false">
-            <input type="hidden" id="nameItalic" value="false">
-        </div>
-
-        <div class="form-group"><label>Ünvan</label><input type="text" class="form-control" id="inpTitle" placeholder="Yetkili Acente" oninput="updatePreview()"></div>
-
-        <div class="section-title">Görsel</div>
-        <div class="form-group"><label>Logo URL</label><input type="text" class="form-control" id="inpLogo" placeholder="https://..." oninput="updatePreview()"></div>
-        <div class="form-group"><label>Arka Plan URL</label><input type="text" class="form-control" id="inpBgImg" placeholder="https://..." oninput="updatePreview()"></div>
-        <div class="form-group"><label>Arka Plan Rengi</label><div style="display:flex; gap:10px;"><input type="color" class="color-input" id="colBg1" value="#1e293b" oninput="updatePreview()"><input type="color" class="color-input" id="colBg2" value="#0f172a" oninput="updatePreview()"></div></div>
-
-        <div class="section-title">İletişim</div>
-        <div class="form-group"><label>Telefon</label><input type="tel" class="form-control" id="inpPhone" oninput="formatPhone(this); updatePreview()"></div>
-        <div class="form-group"><label>WhatsApp</label><input type="tel" class="form-control" id="inpWs" oninput="formatPhone(this); updatePreview()"></div>
-        <div class="form-group"><label>Adres</label><textarea class="form-control" id="inpAddress" rows="2" oninput="updatePreview()"></textarea></div>
-        <div class="form-group" style="background:#f8fafc; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-            <label><i class="fas fa-globe"></i> Web Sitesi</label>
-            <input type="text" class="form-control" id="inpWeb" placeholder="www.site.com" oninput="updatePreview()">
-            <div style="margin-top:5px; display:flex; gap:5px;"><input type="color" class="color-input" id="colWeb" value="#6366f1" oninput="updatePreview()"></div>
-        </div>
-
-        <div class="section-title">Finans</div>
-        <div class="form-group"><label>IBAN (Max 32 Karakter)</label><input type="text" class="form-control" id="inpIban" placeholder="TR..." oninput="formatIBAN(this); updatePreview()"></div>
-        <div class="form-group"><label>Arama Buton Rengi</label><input type="color" class="color-input" id="colBtn" value="#3b82f6" oninput="updatePreview()"></div>
-
-        <button class="btn-generate" onclick="generateLink()">✨ QR Kod ve Link Üret</button>
-        
-        <div class="link-result" id="resBox">
-            <div style="font-size:0.8rem; color:#64748b; margin-bottom:5px;">Mobil Önizleme QR Kodu:</div>
-            <div id="qrcode"></div>
-            <div class="link-actions">
-                <button class="action-sm-btn btn-copy" onclick="copyLink()">📋 Linki Kopyala</button>
-                <a href="https://tinyurl.com/app" target="_blank" class="action-sm-btn btn-shorten">✂️ Kısalt (TinyURL)</a>
+            <div class="mt-6 px-8 py-3 bg-blue-50 border-2 border-blue-200 rounded-full text-blue-700 font-extrabold text-xl tracking-wide flex items-center gap-2">
+                <i data-lucide="camera" class="w-6 h-6"></i> Hızlı İletişim İçin Kameranızla Okutun
             </div>
-            <button class="action-sm-btn btn-print" onclick="printPoster()"><i class="fas fa-print"></i> A4 Poster Yazdır</button>
-            <input type="text" id="finalLinkInput" style="opacity:0; height:1px; width:1px;">
+        </div>
+
+        <div class="text-center border-t border-slate-200 w-full pt-4 pb-2 text-xs text-slate-500 flex justify-between items-center">
+            <span>SigortamRahat // Dijital Acente Asistanı</span>
+            <span>Geliştirici: Batuhan Bayatlı</span>
         </div>
     </div>
 
-    <div class="preview-area">
-        <div class="phone-mockup">
-            <div class="screen" id="screenEl">
-                <div class="screen-overlay"></div>
-                <div class="content-wrapper">
-                    <div class="card-header">
-                        <div class="logo-box"><img src="" id="cardLogo" class="logo-img" style="display:none;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"><i class="fas fa-building" id="logoIcon" style="font-size:3rem; color:#ccc;"></i></div>
-                        <h1 class="firm-name" id="cardName">Firma Adı</h1>
-                        <div class="firm-title" id="cardTitle">Ünvan</div>
+    
+    <header class="border-b border-slate-200 bg-white sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-md">
+                    <i data-lucide="contact" class="w-5 h-5 text-blue-400"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">Dijital Kartvizit<span class="text-blue-600">.pro</span></span>
+                        <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200">bGroup // SigortamRahat</span>
                     </div>
-                    <div class="action-list">
-                        <a href="#" class="action-btn bg-ws" id="btnWs"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                        <a href="#" class="action-btn" id="btnCall"><i class="fas fa-phone-alt"></i> Hemen Ara</a>
-                        <a href="#" class="action-btn hidden" id="btnWeb" target="_blank"><i class="fas fa-globe"></i> Web Sitesi</a>
-                        <a href="#" class="action-btn bg-map" id="btnMap" target="_blank"><i class="fas fa-map-marker-alt"></i> Konuma Git</a>
-                        <div class="action-btn" onclick="copyToClipboard()" style="background: rgba(255,255,255,0.15); cursor: pointer; border: 1px solid rgba(255,255,255,0.2);">
-                            <i class="far fa-credit-card"></i>
-                            <div class="btn-iban-content"><span class="iban-label">IBAN Kopyalamak İçin Tıkla</span><span class="iban-number" id="ibanDisplay">TR00 0000...</span></div>
-                            <input type="hidden" id="rawIban">
+                    <p class="text-[11px] text-slate-500 hidden sm:block">Acenteler İçin Veritabanısız Akıllı İletişim &amp; IBAN Köprüsü</p>
+                </div>
+            </div>
+
+            <a href="https://www.linkedin.com/in/batuhanbayatlı" target="_blank" class="flex items-center gap-2.5 pl-3 border-l border-slate-200 hover:opacity-85 transition">
+                <img src="https://avatars.githubusercontent.com/u/255363609?v=4" class="w-9 h-9 rounded-full border border-slate-200 shadow-sm object-cover" alt="Batuhan Bayatlı">
+                <div class="hidden lg:block text-left">
+                    <div class="text-xs font-extrabold text-slate-900 leading-tight">Batuhan Bayatlı</div>
+                    <div class="text-[10px] text-blue-600 font-semibold leading-tight">InsurTech &amp; AI Specialist</div>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden max-w-7xl w-full mx-auto">
+        
+       
+        <aside class="editor-panel w-full lg:w-[460px] bg-white border-r border-slate-200 overflow-y-auto p-6 space-y-6 shadow-sm">
+            <div>
+                <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-5 h-5 text-blue-600"></i> Kartvizit Bilgilerini Düzenle
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Bilgileri doldurun, link üretin ve müşterilerinizle paylaşın.</p>
+            </div>
+
+            <div class="space-y-4">
+                
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block border-b border-slate-200 pb-1">1. Kurumsal Bilgiler</span>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Acente / Firma Adı</label>
+                        <input type="text" id="inpName" placeholder="Örn: Güneş Sigorta Acenteliği" oninput="updatePreview()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-blue-600 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ünvan / Açıklama</label>
+                        <input type="text" id="inpTitle" placeholder="Örn: Profesyonel Risk &amp; Sigorta Danışmanı" oninput="updatePreview()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-blue-600 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Logo URL (İsteğe Bağlı)</label>
+                        <input type="text" id="inpLogo" placeholder="https://.../logo.png" oninput="updatePreview()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-blue-600 bg-white">
+                    </div>
+                </div>
+
+               
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block border-b border-slate-200 pb-1">2. İletişim &amp; Konum</span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Telefon No</label>
+                            <input type="tel" id="inpPhone" placeholder="05XX XXX XX XX" oninput="formatPhone(this); updatePreview()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-blue-600 bg-white font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp Hattı</label>
+                            <input type="tel" id="inpWs" placeholder="05XX XXX XX XX" oninput="formatPhone(this); updatePreview()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-blue-600 bg-white font-mono">
                         </div>
                     </div>
-                    <div class="footer"><div>Dijital Kartvizit V1</div><div class="dev-signature">Geliştirici: <a href="https://www.linkedin.com/in/batuhanbayatlı/" target="_blank">Batuhan Bayatlı</a></div></div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Web Sitesi</label>
+                        <input type="text" id="inpWeb" placeholder="www.acenteniz.com" oninput="updatePreview()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-blue-600 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ofis Adresi (Harita Navigasyonu İçin)</label>
+                        <textarea id="inpAddress" rows="2" placeholder="Mahalle, Cadde, No, İlçe/İl" oninput="updatePreview()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-blue-600 bg-white resize-none"></textarea>
+                    </div>
                 </div>
-                <div class="toast" id="toast">IBAN Kopyalandı! ✅</div>
+
+                
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block border-b border-slate-200 pb-1">3. Finansal Bilgiler</span>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Banka IBAN Numarası</label>
+                        <input type="text" id="inpIban" placeholder="TR00 0000 0000 0000 0000 0000 00" oninput="formatIBAN(this); updatePreview()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:border-blue-600 bg-white font-mono">
+                    </div>
+                </div>
+
+                
+                <button onclick="generateLink()" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i> Kalıcı Link &amp; QR Kod Üret
+                </button>
+
+               
+                <div id="resBox" class="hidden bg-blue-50 border border-blue-200 p-4 rounded-xl text-center space-y-3">
+                    <span class="text-xs font-bold text-blue-900 block">Mobil Kartvizit QR Kodunuz Hazır:</span>
+                    <div id="qrcode" class="p-2 bg-white rounded-lg shadow-sm w-fit mx-auto border border-blue-100"></div>
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="copyLink()" class="py-2 px-3 bg-blue-600 text-white font-bold text-xs rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-1.5">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Linki Kopyala
+                        </button>
+                        <button onclick="printPoster()" class="py-2 px-3 bg-emerald-600 text-white font-bold text-xs rounded-lg hover:bg-emerald-700 transition flex items-center justify-center gap-1.5">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i> A4 Poster Bas
+                        </button>
+                    </div>
+                    <input type="text" id="finalLinkInput" class="opacity-0 w-0 h-0 absolute">
+                </div>
             </div>
-        </div>
+        </aside>
+
+        
+        <main class="preview-container flex-1 bg-slate-200 flex items-center justify-center p-4 lg:p-8 relative">
+            <div class="phone-wrapper w-[340px] h-[640px] bg-slate-900 rounded-[42px] p-3 shadow-2xl border-4 border-slate-800 relative flex flex-col">
+                
+                <div class="phone-screen bg-slate-950 rounded-[32px] w-full h-full overflow-y-auto relative flex flex-col justify-between text-white p-5 border border-slate-800">
+                    
+                    
+                    <div class="text-center pt-4">
+                        <div class="w-20 h-20 mx-auto rounded-full bg-slate-800 border-2 border-blue-500/40 p-1 flex items-center justify-center overflow-hidden mb-3 shadow-md">
+                            <img id="cardLogo" src="" class="w-full h-full object-cover rounded-full hidden" alt="Acente Logo">
+                            <i data-lucide="building-2" id="cardLogoIcon" class="w-8 h-8 text-blue-400"></i>
+                        </div>
+                        <h3 id="cardName" class="text-lg font-black text-white tracking-tight">Firma Adı</h3>
+                        <p id="cardTitle" class="text-xs text-blue-400 font-semibold mt-0.5">Yetkili Sigorta Acentesi</p>
+                    </div>
+
+                    
+                    <div class="space-y-2.5 my-4">
+                        <a id="btnWs" href="#" target="_blank" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs flex items-center gap-2.5 shadow-sm transition">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp ile Yazın
+                        </a>
+                        <a id="btnCall" href="#" class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs flex items-center gap-2.5 shadow-sm transition">
+                            <i data-lucide="phone-call" class="w-4 h-4"></i> Hemen Arayın
+                        </a>
+                        <a id="btnWeb" href="#" target="_blank" class="hidden w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-xs flex items-center gap-2.5 shadow-sm transition border border-slate-700">
+                            <i data-lucide="globe" class="w-4 h-4"></i> Web Sitesini Ziyaret Et
+                        </a>
+                        <a id="btnMap" href="#" target="_blank" class="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-xs flex items-center gap-2.5 shadow-sm transition">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i> Ofis Yol Tarifi Al
+                        </a>
+                        <div onclick="copyIban()" class="w-full p-2.5 bg-slate-800/90 hover:bg-slate-800 border border-slate-700 text-white rounded-xl cursor-pointer transition flex items-center gap-2.5">
+                            <i data-lucide="credit-card" class="w-4 h-4 text-blue-400 shrink-0"></i>
+                            <div class="overflow-hidden text-left">
+                                <span class="text-[9px] uppercase font-bold text-slate-400 block leading-tight">IBAN Kopyalamak İçin Tıklayın</span>
+                                <span id="cardIban" class="text-[11px] font-mono font-bold text-blue-300 truncate block">TR00 0000 0000...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="text-center border-t border-slate-800/80 pt-3">
+                        <span class="text-[10px] text-slate-500 font-medium block">SigortamRahat // Dijital Kartvizit</span>
+                    </div>
+
+                   
+                    <div id="toast" class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300">
+                        IBAN Kopyalandı! ✅
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
+    
     <script>
-        function checkLegal() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.has('name')) document.getElementById('legalModal').style.display = 'none';
-            else document.getElementById('legalModal').style.display = 'flex';
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            initFromURL();
+        });
+
+        function formatPhone(el) {
+            let v = el.value.replace(/\D/g, '');
+            if (v.startsWith('0')) v = v.substring(1);
+            let f = '';
+            if (v.length > 0) f += '(' + v.substring(0, 3);
+            if (v.length >= 3) f += ') ' + v.substring(3, 6);
+            if (v.length >= 6) f += ' ' + v.substring(6, 8);
+            if (v.length >= 8) f += ' ' + v.substring(8, 10);
+            el.value = f;
         }
-        function acceptLegal() { document.getElementById('legalModal').style.display = 'none'; }
-        function toggleStyle(inputId, btn) {
-            const el = document.getElementById(inputId); el.value = el.value === 'true' ? 'false' : 'true'; btn.classList.toggle('active'); updatePreview();
-        }
-        function formatPhone(i) {
-            let v = i.value.replace(/\D/g, ''); if(v.startsWith('0')) v=v.substring(1);
-            let f = ''; if(v.length>0) f+='('+v.substring(0,3); if(v.length>=3) f+=') '+v.substring(3,6); if(v.length>=6) f+=' '+v.substring(6,8); if(v.length>=8) f+=' '+v.substring(8,10); i.value = f;
-        }
-        function formatIBAN(i) {
-            let v = i.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 32); i.value = v.match(/.{1,4}/g)?.join(' ') || v;
+
+        function formatIBAN(el) {
+            let v = el.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 32);
+            el.value = v.match(/.{1,4}/g)?.join(' ') || v;
         }
 
         function updatePreview() {
-            const name = document.getElementById('inpName').value || 'Firma Adı';
-            const title = document.getElementById('inpTitle').value || 'Ünvan';
-            const phone = document.getElementById('inpPhone').value.replace(/\D/g,'');
-            const ws = document.getElementById('inpWs').value.replace(/\D/g,'') || phone;
+            const name = document.getElementById('inpName').value || 'Güneş Sigorta Acenteliği';
+            const title = document.getElementById('inpTitle').value || 'Profesyonel Risk & Sigorta Danışmanı';
+            const phone = document.getElementById('inpPhone').value.replace(/\D/g, '');
+            const ws = document.getElementById('inpWs').value.replace(/\D/g, '') || phone;
             const addr = document.getElementById('inpAddress').value;
             const web = document.getElementById('inpWeb').value;
             const iban = document.getElementById('inpIban').value;
             const logo = document.getElementById('inpLogo').value;
-            const bgImg = document.getElementById('inpBgImg').value;
 
-            // Renkler
-            const cText = document.getElementById('colText').value;
-            const cBg1 = document.getElementById('colBg1').value;
-            const cBg2 = document.getElementById('colBg2').value;
-            const cBtn = document.getElementById('colBtn').value;
-            const cWeb = document.getElementById('colWeb').value;
-
-            // DOM Updates
+           
             document.getElementById('cardName').innerText = name;
-            document.getElementById('cardName').style.color = cText;
-            document.getElementById('cardName').style.fontWeight = document.getElementById('nameBold').value === 'true' ? '800' : '400';
-            document.getElementById('cardName').style.fontStyle = document.getElementById('nameItalic').value === 'true' ? 'italic' : 'normal';
-            
             document.getElementById('cardTitle').innerText = title;
-            document.getElementById('cardTitle').style.color = cText;
+            document.getElementById('cardIban').innerText = iban || 'TR00 0000 0000...';
 
-            const elScreen = document.getElementById('screenEl');
-            if (bgImg && bgImg.length > 5) elScreen.style.backgroundImage = `url('${bgImg}')`;
-            else elScreen.style.backgroundImage = `linear-gradient(135deg, ${cBg1} 0%, ${cBg2} 100%)`;
-
-            document.getElementById('btnCall').style.background = cBtn;
             document.getElementById('btnCall').href = `tel:+90${phone}`;
-            document.getElementById('btnWs').href = `https://wa.me/90${ws}?text=Merhaba`;
+            document.getElementById('btnWs').href = `https://wa.me/90${ws}?text=Merhaba,%20sigorta%20teklifi%20almak%20istiyorum.`;
             document.getElementById('btnMap').href = addr ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}` : '#';
 
             const btnWeb = document.getElementById('btnWeb');
             if (web && web.length > 3) {
                 btnWeb.classList.remove('hidden');
                 btnWeb.href = web.startsWith('http') ? web : 'https://' + web;
-                btnWeb.style.background = cWeb;
-            } else { btnWeb.classList.add('hidden'); }
-
-            document.getElementById('ibanDisplay').innerText = iban ? iban : 'TR00 0000...';
-            document.getElementById('rawIban').value = iban;
+            } else {
+                btnWeb.classList.add('hidden');
+            }
 
             const img = document.getElementById('cardLogo');
-            const icon = document.getElementById('logoIcon');
-            if(logo && logo.length > 5) { img.src=logo; img.style.display='block'; icon.style.display='none'; }
-            else { img.style.display='none'; icon.style.display='block'; }
+            const icon = document.getElementById('cardLogoIcon');
+            if (logo && logo.length > 5) {
+                img.src = logo;
+                img.classList.remove('hidden');
+                icon.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                icon.classList.remove('hidden');
+            }
         }
 
         function generateLink() {
             const baseUrl = window.location.href.split('?')[0];
             const p = new URLSearchParams();
-            
+
             p.append('name', document.getElementById('inpName').value);
             p.append('title', document.getElementById('inpTitle').value);
             p.append('phone', document.getElementById('inpPhone').value);
@@ -327,80 +317,76 @@
             p.append('web', document.getElementById('inpWeb').value);
             p.append('iban', document.getElementById('inpIban').value);
             p.append('logo', document.getElementById('inpLogo').value);
-            p.append('bg', document.getElementById('inpBgImg').value);
-            p.append('c1', document.getElementById('colBg1').value.replace('#',''));
-            p.append('c2', document.getElementById('colBg2').value.replace('#',''));
-            p.append('cb', document.getElementById('colBtn').value.replace('#',''));
-            p.append('cw', document.getElementById('colWeb').value.replace('#',''));
-            p.append('ct', document.getElementById('colText').value.replace('#',''));
-            p.append('sb', document.getElementById('nameBold').value === 'true' ? '1' : '0');
-            p.append('si', document.getElementById('nameItalic').value === 'true' ? '1' : '0');
 
             const fullLink = `${baseUrl}?${p.toString()}`;
-            document.getElementById('resBox').style.display = 'block';
+            document.getElementById('resBox').classList.remove('hidden');
             document.getElementById('finalLinkInput').value = fullLink;
 
             
-            const qrSmall = document.getElementById("qrcode");
-            qrSmall.innerHTML = "";
-            new QRCode(qrSmall, { text: fullLink, width: 150, height: 150, correctLevel: QRCode.CorrectLevel.L });
+            const qrBox = document.getElementById('qrcode');
+            qrBox.innerHTML = '';
+            new QRCode(qrBox, { text: fullLink, width: 140, height: 140, correctLevel: QRCode.CorrectLevel.M });
 
             
-            document.getElementById('printName').innerText = document.getElementById('inpName').value || "Firma Adı";
-            document.getElementById('printTitle').innerText = document.getElementById('inpTitle').value || "Yetkili Acente";
+            document.getElementById('printName').innerText = document.getElementById('inpName').value || 'Firma Adı';
+            document.getElementById('printTitle').innerText = document.getElementById('inpTitle').value || 'Yetkili Sigorta Acentesi';
             
-            const logoUrl = document.getElementById('inpLogo').value;
-            if(logoUrl && logoUrl.length > 5) {
-                document.getElementById('printLogo').src = logoUrl;
-                document.getElementById('printLogo').style.display = 'block';
-                document.getElementById('printIcon').style.display = 'none';
+            const pLogo = document.getElementById('printLogo');
+            const pIcon = document.getElementById('printLogoFallback');
+            const logoVal = document.getElementById('inpLogo').value;
+            if (logoVal && logoVal.length > 5) {
+                pLogo.src = logoVal;
+                pLogo.classList.remove('hidden');
+                pIcon.classList.add('hidden');
             } else {
-                document.getElementById('printLogo').style.display = 'none';
-                document.getElementById('printIcon').style.display = 'block';
+                pLogo.classList.add('hidden');
+                pIcon.classList.remove('hidden');
             }
 
-            
-            const qrPoster = document.getElementById("qrcode-poster");
-            qrPoster.innerHTML = "";
-            new QRCode(qrPoster, { text: fullLink, width: 350, height: 350, correctLevel: QRCode.CorrectLevel.L });
+            const qrPoster = document.getElementById('qrcode-poster');
+            qrPoster.innerHTML = '';
+            new QRCode(qrPoster, { text: fullLink, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.H });
+
+            lucide.createIcons();
         }
-        
-        function printPoster() { window.print(); }
 
         function copyLink() {
-            const link = document.getElementById('finalLinkInput'); link.select(); document.execCommand("copy"); alert("Link Kopyalandı!");
+            const link = document.getElementById('finalLinkInput').value;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Kartvizit bağlantınız panoya kopyalandı!');
+            });
         }
 
-        window.onload = function() {
-            checkLegal();
+        function copyIban() {
+            const iban = document.getElementById('inpIban').value;
+            if (iban) {
+                navigator.clipboard.writeText(iban).then(() => {
+                    const toast = document.getElementById('toast');
+                    toast.style.opacity = '1';
+                    setTimeout(() => toast.style.opacity = '0', 2000);
+                });
+            }
+        }
+
+        function printPoster() {
+            window.print();
+        }
+
+        function initFromURL() {
             const p = new URLSearchParams(window.location.search);
             if (p.has('name')) {
                 document.body.classList.add('view-mode');
-                document.getElementById('inpName').value = p.get('name');
-                document.getElementById('inpTitle').value = p.get('title');
-                document.getElementById('inpPhone').value = p.get('phone');
-                document.getElementById('inpWs').value = p.get('ws');
-                document.getElementById('inpAddress').value = p.get('addr');
-                document.getElementById('inpWeb').value = p.get('web');
-                document.getElementById('inpIban').value = p.get('iban');
-                document.getElementById('inpLogo').value = p.get('logo');
-                document.getElementById('inpBgImg').value = p.get('bg');
-                if(p.get('c1')) document.getElementById('colBg1').value = '#' + p.get('c1');
-                if(p.get('c2')) document.getElementById('colBg2').value = '#' + p.get('c2');
-                if(p.get('cb')) document.getElementById('colBtn').value = '#' + p.get('cb');
-                if(p.get('cw')) document.getElementById('colWeb').value = '#' + p.get('cw');
-                if(p.get('ct')) document.getElementById('colText').value = '#' + p.get('ct');
-                document.getElementById('nameBold').value = p.get('sb') === '1' ? 'true' : 'false';
-                document.getElementById('nameItalic').value = p.get('si') === '1' ? 'true' : 'false';
+                document.getElementById('inpName').value = p.get('name') || '';
+                document.getElementById('inpTitle').value = p.get('title') || '';
+                document.getElementById('inpPhone').value = p.get('phone') || '';
+                document.getElementById('inpWs').value = p.get('ws') || '';
+                document.getElementById('inpAddress').value = p.get('addr') || '';
+                document.getElementById('inpWeb').value = p.get('web') || '';
+                document.getElementById('inpIban').value = p.get('iban') || '';
+                document.getElementById('inpLogo').value = p.get('logo') || '';
                 updatePreview();
             }
-        };
-        
-        function copyToClipboard() {
-            const text = document.getElementById('rawIban').value;
-            if(text) { navigator.clipboard.writeText(text); document.getElementById('toast').style.opacity = '1'; setTimeout(() => document.getElementById('toast').style.opacity = '0', 2000); }
         }
     </script>
 </body>
 </html>
-
